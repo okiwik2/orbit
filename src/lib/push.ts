@@ -1,4 +1,3 @@
-import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
@@ -23,10 +22,9 @@ export async function registerPush(uid: string) {
   let { granted } = await Notifications.getPermissionsAsync();
   if (!granted) granted = (await Notifications.requestPermissionsAsync()).granted;
   if (!granted) return false;
-  const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
-  if (!projectId) return false; // run `npx eas-cli init` first
-  const { data: token } = await Notifications.getExpoPushTokenAsync({ projectId });
-  await supabase.from('push_tokens').upsert({ token, user_id: uid, kind: 'expo' });
+  // Native Firebase token: notifications go straight from our server to Google, no middleman.
+  const { data: token } = await Notifications.getDevicePushTokenAsync();
+  await supabase.from('push_tokens').upsert({ token: String(token), user_id: uid, kind: 'fcm' });
   return true;
 }
 
