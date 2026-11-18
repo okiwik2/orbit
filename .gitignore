@@ -50,3 +50,5 @@ supabase/.temp/
 # Firebase (never public)
 google-services.json
 *firebase-adminsdk*.json
+build-android.log
+orbit.apk
