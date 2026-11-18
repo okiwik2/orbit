@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 
+import { FormScroll } from '@/components/keyboard';
 import { Avatar, Button, Field, Press, T } from '@/components/ui';
 import { COLORS, EMOJIS } from '@/lib/avatars';
 import { useSession } from '@/lib/session';
@@ -14,9 +15,9 @@ export default function Profile() {
   const [emoji, setEmoji] = useState(profile?.emoji ?? '🙂');
   const [color, setColor] = useState(profile?.color ?? COLORS[0]);
   return (
-    <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 20, gap: 16, maxWidth: 520, width: '100%', alignSelf: 'center' }}>
+    <FormScroll style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 20, gap: 16, maxWidth: 520, width: '100%', alignSelf: 'center' }}>
       <View style={{ alignItems: 'center' }}><Avatar emoji={emoji} color={color} size={96} ring="#fff" /></View>
-      <Field value={name} onChangeText={setName} maxLength={40} placeholder="Your name" />
+      <Field value={name} onChangeText={setName} maxLength={40} placeholder="Your name" autoCapitalize="words" autoComplete="name" />
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
         {EMOJIS.map((e) => (
           <Press key={e} onPress={() => setEmoji(e)} style={{ width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: e === emoji ? c.accentSoft : c.card }}>
@@ -33,6 +34,6 @@ export default function Profile() {
         await updateProfile({ name: name.trim(), emoji, color });
         router.back();
       }} />
-    </ScrollView>
+    </FormScroll>
   );
 }

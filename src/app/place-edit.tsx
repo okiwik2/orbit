@@ -1,7 +1,8 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Platform, ScrollView, View } from 'react-native';
+import { Platform, View } from 'react-native';
 
+import { FormScroll } from '@/components/keyboard';
 import { OrbitMap } from '@/components/OrbitMap';
 import { Button, Chip, Field, Sub, T } from '@/components/ui';
 import { useCircle } from '@/lib/circle';
@@ -59,12 +60,12 @@ export default function PlaceEdit() {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 16, gap: 14, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
+    <FormScroll style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 16, gap: 14, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
       <View style={{ height: 240, borderRadius: radius.md, overflow: 'hidden', backgroundColor: c.card }}>
         {pos && <OrbitMap people={[]} places={preview} dark={dark} focus={focus} onLongPress={(lat, lng) => setPos({ lat, lng })} />}
       </View>
       <Sub>Long-press the map to move the place.</Sub>
-      <Field placeholder="Name (e.g. Home, Grandma's)" value={name} onChangeText={setName} maxLength={40} />
+      <Field placeholder="Name (e.g. Home, Grandma's)" value={name} onChangeText={setName} maxLength={40} autoCapitalize="words" />
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
         {KINDS.map(([k, label]) => <Chip key={k} label={label} active={kind === k} onPress={() => setKind(k)} />)}
       </View>
@@ -75,6 +76,6 @@ export default function PlaceEdit() {
       <Button title={existing ? 'Save changes' : 'Add place'} onPress={save} loading={busy} disabled={!pos || !name.trim()} />
       {existing && <Button title="Delete place" kind="ghost" onPress={del} />}
       {error ? <T color={c.danger}>{error}</T> : null}
-    </ScrollView>
+    </FormScroll>
   );
 }

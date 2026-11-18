@@ -7,6 +7,7 @@ import { AppState, Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { KeyboardProvider } from '@/components/keyboard';
 import { Sub, T } from '@/components/ui';
 import { CircleProvider } from '@/lib/circle';
 import { useCrashSensor } from '@/lib/crash';
@@ -101,6 +102,7 @@ export default function Layout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
+        <KeyboardProvider>
         <ThemeProvider>
           {configured ? (
             <SessionProvider>
@@ -112,6 +114,7 @@ export default function Layout() {
             <NotConfigured />
           )}
         </ThemeProvider>
+        </KeyboardProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

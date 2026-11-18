@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Platform, ScrollView, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { FormScroll } from '@/components/keyboard';
 import { Avatar, Button, Card, Field, Icon, Press, Sub, T, type IconName } from '@/components/ui';
 import { COLORS, EMOJIS } from '@/lib/avatars';
 import { useSession } from '@/lib/session';
@@ -33,7 +34,7 @@ export default function Consent() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
-      <ScrollView contentContainerStyle={{ padding: 24, gap: 16, maxWidth: 520, width: '100%', alignSelf: 'center', flexGrow: 1 }}>
+      <FormScroll contentContainerStyle={{ padding: 24, gap: 16, maxWidth: 520, width: '100%', alignSelf: 'center', flexGrow: 1 }}>
         {step === 0 && (
           <Animated.View entering={FadeInRight} style={{ gap: 16 }}>
             <T size={30} weight="800">How Orbit works</T>
@@ -59,7 +60,7 @@ export default function Consent() {
             <View style={{ alignItems: 'center', marginVertical: 8 }}>
               <Avatar emoji={emoji} color={color} size={96} ring="#fff" />
             </View>
-            <Field placeholder="Your name" value={name} onChangeText={setName} maxLength={40} />
+            <Field placeholder="Your name" value={name} onChangeText={setName} maxLength={40} autoCapitalize="words" autoComplete="name" textContentType="givenName" returnKeyType="next" onSubmitEditing={() => name.trim() && setStep(2)} />
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
               {EMOJIS.map((e) => (
                 <Press key={e} onPress={() => setEmoji(e)} style={{ width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: e === emoji ? c.accentSoft : c.card }}>
@@ -106,7 +107,7 @@ export default function Consent() {
             {!perm && <Button title="Not now" kind="ghost" onPress={finish} />}
           </Animated.View>
         )}
-      </ScrollView>
+      </FormScroll>
     </SafeAreaView>
   );
 }

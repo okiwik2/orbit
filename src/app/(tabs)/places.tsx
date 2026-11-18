@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FormScroll } from '@/components/keyboard';
 import { Button, Card, Field, Icon, Press, Sub, T } from '@/components/ui';
 import { useCircle } from '@/lib/circle';
 import { clock, placeAt } from '@/lib/geo';
@@ -56,7 +57,7 @@ export default function Places() {
   const who = (pl: Place) => people.filter((p) => p.loc && placeAt([pl], p.loc.lat, p.loc.lng));
 
   return (
-    <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, gap: 14, maxWidth: 680, width: '100%', alignSelf: 'center' }}>
+    <FormScroll style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, gap: 14, maxWidth: 680, width: '100%', alignSelf: 'center' }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <T size={32} weight="800" style={{ flex: 1 }}>Places</T>
         <Press onPress={() => router.push('/place-edit')} style={{ backgroundColor: c.accent, borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
@@ -99,7 +100,7 @@ export default function Places() {
                 </Animated.View>
               ))}
               <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-                <Field placeholder="Remind on arrival…" value={draft[pl.id] ?? ''} onChangeText={(t) => setDraft((d) => ({ ...d, [pl.id]: t }))}
+                <Field placeholder="Remind me when I arrive…" autoCapitalize="sentences" autoCorrect returnKeyType="send" submitBehavior="submit" value={draft[pl.id] ?? ''} onChangeText={(t) => setDraft((d) => ({ ...d, [pl.id]: t }))}
                   onSubmitEditing={() => addReminder(pl)} style={{ flex: 1, paddingVertical: 10 }} maxLength={200} />
                 <Press onPress={() => setForMe((f) => ({ ...f, [pl.id]: !f[pl.id] }))} style={{ padding: 6 }}>
                   <Icon name={forMe[pl.id] ? 'person' : 'people'} size={20} color={c.sub} />
@@ -128,6 +129,6 @@ export default function Places() {
           </Card>
         </>
       )}
-    </ScrollView>
+    </FormScroll>
   );
 }

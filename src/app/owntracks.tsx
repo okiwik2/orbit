@@ -1,8 +1,9 @@
 import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking';
 import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 
+import { FormScroll } from '@/components/keyboard';
 import { Button, Card, Sub, T } from '@/components/ui';
 import { useSession } from '@/lib/session';
 import { supabase, SUPABASE_URL } from '@/lib/supabase';
@@ -49,7 +50,7 @@ export default function OwnTracks() {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 16, gap: 14, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
+    <FormScroll style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 16, gap: 14, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
       <T size={15}>
         iPhones only let web apps read location while they're open. OwnTracks is a free, open-source app that sends your location to Orbit in
         the background, so your circle always sees where you are.
@@ -76,6 +77,6 @@ export default function OwnTracks() {
         </Card>
       )}
       <Sub>Battery: OwnTracks uses "significant changes" mode, which updates when you move a few hundred metres. Your privacy settings (pause, approximate) still apply.</Sub>
-    </ScrollView>
+    </FormScroll>
   );
 }

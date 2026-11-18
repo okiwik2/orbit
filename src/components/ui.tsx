@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import type { ComponentProps, ReactNode } from 'react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
 import {
   ActivityIndicator, Platform, Pressable, StyleSheet, Switch, Text, TextInput, View,
   type StyleProp, type TextInputProps, type TextStyle, type ViewStyle,
@@ -22,7 +22,7 @@ export function T({ children, size = 15, weight = '400', color, style, numberOfL
 }) {
   const { c } = useTheme();
   return (
-    <Text numberOfLines={numberOfLines} style={[{ fontSize: size, fontWeight: weight, color: color ?? c.text, letterSpacing: size > 22 ? -0.5 : 0 }, style]}>
+    <Text numberOfLines={numberOfLines} maxFontSizeMultiplier={1.35} style={[{ fontSize: size, fontWeight: weight, color: color ?? c.text, letterSpacing: size > 22 ? -0.5 : 0 }, style]}>
       {children}
     </Text>
   );
@@ -76,13 +76,35 @@ export function Button({ title, onPress, kind = 'primary', icon, loading, disabl
   );
 }
 
+/** Text box: 52px tall (easy to hit), accent border while typing, sensible keyboard defaults. */
 export function Field(props: TextInputProps) {
   const { c } = useTheme();
+  const [focused, setFocused] = useState(false);
   return (
     <TextInput
       placeholderTextColor={c.sub}
+      selectionColor={c.accent}
+      cursorColor={c.accent}
+      maxFontSizeMultiplier={1.35}
+      returnKeyType="done"
+      autoCorrect={false}
       {...props}
-      style={[{ backgroundColor: c.cardAlt, color: c.text, borderRadius: radius.sm, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16 }, props.style]}
+      onFocus={(e) => {
+        setFocused(true);
+        props.onFocus?.(e);
+      }}
+      onBlur={(e) => {
+        setFocused(false);
+        props.onBlur?.(e);
+      }}
+      style={[
+        {
+          backgroundColor: c.cardAlt, color: c.text, borderRadius: radius.sm, paddingHorizontal: 16, paddingVertical: 14,
+          minHeight: 52, fontSize: 17, borderWidth: 2, borderColor: focused ? c.accent : 'transparent',
+        },
+        Platform.OS === 'web' && ({ outlineStyle: 'none' } as object),
+        props.style,
+      ]}
     />
   );
 }
@@ -93,7 +115,7 @@ export function Avatar({ emoji, color, size = 44, ring, dim }: { emoji: string; 
       width: size, height: size, borderRadius: size / 2, backgroundColor: color, alignItems: 'center', justifyContent: 'center',
       borderWidth: ring ? 3 : 0, borderColor: ring, opacity: dim ? 0.5 : 1,
     }}>
-      <Text style={{ fontSize: size * 0.5 }}>{emoji}</Text>
+      <Text allowFontScaling={false} style={{ fontSize: size * 0.5 }}>{emoji}</Text>
     </View>
   );
 }

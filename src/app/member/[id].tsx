@@ -72,7 +72,7 @@ export default function MemberScreen() {
   const where = person.loc ? placeAt(places, person.loc.lat, person.loc.lng)?.name ?? 'Out and about' : 'Not sharing';
 
   return (
-    <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
       <Stack.Screen options={{ title: person.profile.name }} />
       <View style={{ height: 300, backgroundColor: c.card }}>
         <OrbitMap people={day === 0 ? [person] : []} places={places} dark={dark} route={route} bottomInset={0} />

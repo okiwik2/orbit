@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, View } from 'react-native';
+import { FlatList, Platform, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { KeyboardScreen } from '@/components/keyboard';
 import { Avatar, Field, Icon, Press, Sub, T } from '@/components/ui';
 import { useCircle } from '@/lib/circle';
 import { clock } from '@/lib/geo';
@@ -45,7 +46,7 @@ export default function Chat() {
   const person = (id: string | null) => people.find((p) => p.user_id === id);
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardScreen style={{ backgroundColor: c.bg }}>
       <View style={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 8 }}>
         <T size={32} weight="800">Chat</T>
         <Sub>{circles.find((x) => x.id === circleId)?.name}</Sub>
@@ -55,7 +56,9 @@ export default function Chat() {
         inverted
         data={msgs}
         keyExtractor={(m) => String(m.id)}
-        contentContainerStyle={{ padding: 12, gap: 6 }}
+        contentContainerStyle={{ padding: 12, gap: 6, maxWidth: 760, width: '100%', alignSelf: 'center' }}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
         renderItem={({ item: m, index }) => {
           const p = person(m.user_id);
           const mine = m.user_id === uid;
@@ -80,10 +83,29 @@ export default function Chat() {
         }}
         ListEmptyComponent={<Sub style={{ textAlign: 'center', marginTop: 40, transform: [{ scaleY: -1 }] }}>Say hi to your circle 👋</Sub>}
       />
-      <View style={{ flexDirection: 'row', gap: 8, padding: 10, alignItems: 'center', borderTopWidth: 1, borderTopColor: c.line, backgroundColor: c.card }}>
-        <Field placeholder="Message" value={text} onChangeText={setText} onSubmitEditing={send} style={{ flex: 1, paddingVertical: 11 }} maxLength={2000} />
-        <Press onPress={send} disabled={!text.trim()}><Icon name="arrow-up-circle" size={38} color={c.accent} /></Press>
+      <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 10, paddingTop: 8, paddingBottom: 8, alignItems: 'flex-end', borderTopWidth: 1, borderTopColor: c.line, backgroundColor: c.card }}>
+        <Field
+          placeholder="Message"
+          value={text}
+          onChangeText={setText}
+          multiline
+          autoCorrect
+          autoCapitalize="sentences"
+          returnKeyType="default"
+          maxLength={2000}
+          style={{ flex: 1, maxHeight: 130, paddingTop: 13, textAlignVertical: 'top' }}
+          // on a computer keyboard, Enter sends and Shift+Enter adds a new line
+          onKeyPress={(e: any) => {
+            if (Platform.OS === 'web' && e.nativeEvent.key === 'Enter' && !e.nativeEvent.shiftKey) {
+              e.preventDefault?.();
+              send();
+            }
+          }}
+        />
+        <Press onPress={send} disabled={!text.trim()} style={{ paddingBottom: 4 }}>
+          <Icon name="arrow-up-circle" size={44} color={c.accent} />
+        </Press>
       </View>
-    </KeyboardAvoidingView>
+    </KeyboardScreen>
   );
 }

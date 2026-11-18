@@ -1,5 +1,4 @@
 import { Tabs } from 'expo-router';
-import { Platform } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui';
 import { useTheme } from '@/lib/theme';
@@ -19,7 +18,10 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: c.accent,
         tabBarInactiveTintColor: c.sub,
-        tabBarStyle: { backgroundColor: c.card, borderTopColor: c.line, height: Platform.OS === 'web' ? 64 : undefined },
+        tabBarStyle: { backgroundColor: c.card, borderTopColor: c.line },
+        // hide the tab bar while typing so the keyboard has room (Android)
+        tabBarHideOnKeyboard: true,
+        tabBarAllowFontScaling: false,
         tabBarLabelStyle: { fontWeight: '600', fontSize: 11 },
       }}>
       {TABS.map(([name, title, icon]) => (

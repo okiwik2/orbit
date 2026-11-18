@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, useWindowDimensions, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -15,7 +15,6 @@ import { radius, useTheme } from '@/lib/theme';
 import { currentPosition } from '@/lib/tracker';
 import { getWeather } from '@/lib/weather';
 
-const PEEK = 300;
 
 export default function MapScreen() {
   const { c, dark } = useTheme();
@@ -23,7 +22,10 @@ export default function MapScreen() {
   const { session } = useSession();
   const { circles, circleId, people, places, etas, sos, me } = useCircle();
   const [focus, setFocus] = useState<{ lat: number; lng: number; key: number } | null>(null);
-  const [sheetH, setSheetH] = useState(PEEK);
+  const { height: screenH } = useWindowDimensions();
+  // bottom panel: about a third of the screen, never cramped or taking over a small phone
+  const peek = Math.round(Math.min(320, Math.max(210, screenH * 0.34)));
+  const [sheetH, setSheetH] = useState(peek);
   const [weather, setWeather] = useState<Record<string, string>>({});
   const [checkingIn, setCheckingIn] = useState(false);
   const circle = circles.find((x) => x.id === circleId);
@@ -114,8 +116,8 @@ export default function MapScreen() {
         );
       })}
 
-      <Sheet peek={PEEK} onHeight={setSheetH}>
-        <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}>
+      <Sheet peek={peek} onHeight={setSheetH}>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
             <Button title="Check in" icon="checkmark-circle" kind="secondary" onPress={checkIn} loading={checkingIn} style={{ flex: 1, paddingVertical: 11 }} />
             <Button title="Share ETA" icon="navigate" kind="secondary" onPress={() => router.push('/eta')} style={{ flex: 1, paddingVertical: 11 }} />

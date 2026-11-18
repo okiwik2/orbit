@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { FormScroll } from '@/components/keyboard';
 import { Button, Field, Icon, Sub, T } from '@/components/ui';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/lib/theme';
@@ -23,17 +24,18 @@ export default function SignIn() {
     if (error) setError(error.message);
     else setSent(true);
   };
-  const verify = async () => {
+  const verify = async (token = code) => {
+    if (busy) return;
     setBusy(true);
     setError('');
-    const { error } = await supabase.auth.verifyOtp({ email: email.trim().toLowerCase(), token: code.trim(), type: 'email' });
+    const { error } = await supabase.auth.verifyOtp({ email: email.trim().toLowerCase(), token: token.trim(), type: 'email' });
     setBusy(false);
     if (error) setError(error.message);
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, justifyContent: 'center', padding: 28, maxWidth: 480, width: '100%', alignSelf: 'center' }}>
+      <FormScroll contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24, maxWidth: 480, width: '100%', alignSelf: 'center' }}>
         <Animated.View entering={FadeInUp.duration(600)} style={{ alignItems: 'center', marginBottom: 40 }}>
           <View style={{ width: 88, height: 88, borderRadius: 30, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
             <Icon name="planet" size={50} color="#fff" />
@@ -45,21 +47,29 @@ export default function SignIn() {
         <Animated.View entering={FadeInDown.delay(200).duration(500)} style={{ gap: 12 }}>
           {!sent ? (
             <>
-              <Field placeholder="Email address" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" autoComplete="email" onSubmitEditing={send} />
+              <Field placeholder="Email address" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
+                autoComplete="email" textContentType="emailAddress" inputMode="email" returnKeyType="send" autoFocus
+                onSubmitEditing={() => /^\S+@\S+\.\S+$/.test(email.trim()) && send()} />
               <Button title="Send me a code" onPress={send} loading={busy} disabled={!/^\S+@\S+\.\S+$/.test(email.trim())} />
             </>
           ) : (
             <>
               <Sub style={{ textAlign: 'center' }}>We emailed a code to {email.trim()}</Sub>
-              <Field placeholder="Code" value={code} onChangeText={(t) => setCode(t.replace(/\D/g, ''))} keyboardType="number-pad" autoComplete="one-time-code" maxLength={8}
-                style={{ textAlign: 'center', fontSize: 26, letterSpacing: 8 }} onSubmitEditing={verify} />
-              <Button title="Sign in" onPress={verify} loading={busy} disabled={code.length < 6} />
+              <Field placeholder="8-digit code" value={code} autoFocus keyboardType="number-pad" inputMode="numeric" autoComplete="one-time-code" textContentType="oneTimeCode" maxLength={8}
+                returnKeyType="go"
+                onChangeText={(t) => {
+                  const digits = t.replace(/\D/g, '').slice(0, 8);
+                  setCode(digits);
+                  if (digits.length === 8) verify(digits); // pasted or fully typed: sign in straight away
+                }}
+                style={{ textAlign: 'center', fontSize: 26, letterSpacing: 8 }} onSubmitEditing={() => verify()} />
+              <Button title="Sign in" onPress={() => verify()} loading={busy} disabled={code.length < 6} />
               <Button title="Use a different email" kind="ghost" onPress={() => { setSent(false); setCode(''); }} />
             </>
           )}
           {error ? <T color={c.danger} size={14} style={{ textAlign: 'center' }}>{error}</T> : null}
         </Animated.View>
-      </KeyboardAvoidingView>
+      </FormScroll>
     </SafeAreaView>
   );
 }

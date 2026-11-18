@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Platform, ScrollView, View } from 'react-native';
+import { Alert, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FormScroll } from '@/components/keyboard';
 import { Avatar, Button, Chip, Field, Row, Section, Sub, T, Toggle } from '@/components/ui';
 import { useCircle } from '@/lib/circle';
 import { pushSupported, registerPush } from '@/lib/push';
@@ -46,7 +47,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, maxWidth: 680, width: '100%', alignSelf: 'center' }}>
+    <FormScroll style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, maxWidth: 680, width: '100%', alignSelf: 'center' }}>
       <T size={32} weight="800" style={{ marginBottom: 16 }}>Settings</T>
 
       <Section>
@@ -122,7 +123,7 @@ export default function SettingsScreen() {
         <Section title="Home Assistant">
           <View style={{ paddingVertical: 10, gap: 8 }}>
             <Sub>When you arrive at or leave a "Home" place, Orbit sends a webhook to Home Assistant. Use a public https webhook URL (e.g. via Nabu Casa or your remote URL).</Sub>
-            <Field placeholder="https://…/api/webhook/orbit-…" value={ha} onChangeText={setHa} autoCapitalize="none" />
+            <Field placeholder="https://…/api/webhook/orbit-…" value={ha} onChangeText={setHa} autoCapitalize="none" keyboardType="url" textContentType="URL" />
             <Button title="Save webhook" kind="secondary" disabled={(ha || null) === settings.ha_webhook_url || (ha !== '' && !ha.startsWith('https://'))}
               onPress={() => setSetting({ ha_webhook_url: ha.trim() || null })} />
           </View>
@@ -148,6 +149,6 @@ export default function SettingsScreen() {
         }} />
       </Section>
       <Sub style={{ textAlign: 'center', marginBottom: 30 }}>Orbit 1.0 · location history auto-deletes after 7 days</Sub>
-    </ScrollView>
+    </FormScroll>
   );
 }

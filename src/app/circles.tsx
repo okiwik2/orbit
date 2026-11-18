@@ -2,8 +2,9 @@ import * as Clipboard from 'expo-clipboard';
 import * as Linking from 'expo-linking';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Platform, ScrollView, Share, View } from 'react-native';
+import { Alert, Platform, Share, View } from 'react-native';
 
+import { FormScroll } from '@/components/keyboard';
 import { Avatar, Button, Card, Field, Icon, Press, Row, Section, Sub, T } from '@/components/ui';
 import { useCircle } from '@/lib/circle';
 import { useSession } from '@/lib/session';
@@ -71,7 +72,7 @@ export default function Circles() {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 16, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
+    <FormScroll style={{ backgroundColor: c.bg }} contentContainerStyle={{ padding: 16, maxWidth: 640, width: '100%', alignSelf: 'center' }}>
       {circles.length > 0 && (
         <Section title="Your circles">
           {circles.map((x) => (
@@ -116,7 +117,9 @@ export default function Circles() {
 
       <Section title="Join with a code">
         <View style={{ paddingVertical: 10, gap: 10 }}>
-          <Field placeholder="ABCD2345" value={code} onChangeText={(t) => setCode(t.toUpperCase())} autoCapitalize="characters" maxLength={8} />
+          <Field placeholder="ABCD2345" value={code} onChangeText={(t) => setCode(t.toUpperCase().replace(/[^A-Z0-9]/g, ''))} autoCapitalize="characters" maxLength={8}
+            returnKeyType="go" onSubmitEditing={() => code.length >= 6 && router.push({ pathname: '/join/[code]', params: { code } })}
+            style={{ textAlign: 'center', fontSize: 22, letterSpacing: 4 }} />
           <Button title="Continue" kind="secondary" disabled={code.length < 6}
             onPress={() => router.push({ pathname: '/join/[code]', params: { code } })} />
         </View>
@@ -124,11 +127,11 @@ export default function Circles() {
 
       <Section title="Create a new circle">
         <View style={{ paddingVertical: 10, gap: 10 }}>
-          <Field placeholder="e.g. Family" value={name} onChangeText={setName} maxLength={40} />
+          <Field placeholder="e.g. Family" value={name} onChangeText={setName} maxLength={40} autoCapitalize="words" returnKeyType="done" onSubmitEditing={() => name.trim() && create()} />
           <Button title="Create circle" kind="secondary" onPress={create} loading={busy === 'create'} disabled={!name.trim()} />
         </View>
       </Section>
       {error ? <T color={c.danger} style={{ textAlign: 'center' }}>{error}</T> : null}
-    </ScrollView>
+    </FormScroll>
   );
 }
