@@ -1,0 +1,7 @@
+project_id = "orbit"
+
+[functions.notify]
+verify_jwt = false
+
+[functions.owntracks-ingest]
+verify_jwt = false
